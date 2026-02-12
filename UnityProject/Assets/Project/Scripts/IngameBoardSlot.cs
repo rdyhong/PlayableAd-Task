@@ -4,57 +4,6 @@ using UnityEngine.EventSystems;
 using DG.Tweening;
 using TMPro;
 
-public class SlotData
-{
-    public IngameBoardSlot BoardSlot { get; private set; } = null;
-    public IngameBoardSlotCell SlotCell { get; private set; }
-    public Vector2Int Coord { get; private set; } = Vector2Int.zero;
-    public int Grade { get; private set; } = 0;
-
-    public SlotData(IngameBoardSlot boardSlot, Vector2Int coord, int grade)
-    {
-        BoardSlot = boardSlot;
-        Coord = coord;
-        Grade = grade;
-        BoardSlot.Initialize(this);
-    }
-
-    public void ClearSlot()
-    {
-        if (SlotCell != null)
-        {
-            ObjectPoolMgr.Inst.Recycle(SlotCell.gameObject);
-            SlotCell = null;
-        }
-        Grade = 0;
-        BoardSlot.ClearSlot();
-    }
-
-    public void CreateSlotCell()
-    {
-        if (SlotCell != null) ObjectPoolMgr.Inst.Recycle(SlotCell.gameObject);
-        BoardSlot.CreateSlotCell(Grade);
-        IngameBoardSlotCell cell = ObjectPoolMgr.Inst.Spawn<IngameBoardSlotCell>("Project/Prefabs/UI/IngameBoardSlotCell");
-        cell.Initialize();
-        cell.Rt.SetParent(InGameMain.Inst.MainUI.InGameUI.BoardUI.RtCellsParent, false);
-        cell.Rt.localScale = Vector3.one;
-        cell.Rt.anchoredPosition3D = BoardSlot.Rt.anchoredPosition3D;
-        SlotCell = cell;
-    }
-
-    public void Upgrade()
-    {
-        if (SlotCell != null) ObjectPoolMgr.Inst.Recycle(SlotCell.gameObject);
-        SlotCell = ObjectPoolMgr.Inst.Spawn<IngameBoardSlotCell>("Project/Prefabs/UI/IngameBoardSlotCell");
-        SlotCell.Initialize();
-        SlotCell.Rt.SetParent(InGameMain.Inst.MainUI.InGameUI.BoardUI.RtCellsParent, false);
-        SlotCell.Rt.localScale = Vector3.one;
-        SlotCell.Rt.anchoredPosition3D = BoardSlot.Rt.anchoredPosition3D;
-        Grade++;
-        BoardSlot.UpgradeSlot(Grade);
-    }
-}
-
 public class IngameBoardSlot : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
 {
     [SerializeField] private TextMeshProUGUI _txtGrade;
