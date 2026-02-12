@@ -27,8 +27,12 @@ public class InGameCharacter : EntityBase
         _cachedTransform = transform;
     }
 
-    public void Init()
+    public override void Initialize()
     {
+        base.Initialize();
+
+        transform.position = InGameMain.Inst.CachedPosition.CharacterPos;
+
         InitStat(StatData.PlayerDefault());
         Level = 1;
         Exp = 0;
@@ -42,7 +46,7 @@ public class InGameCharacter : EntityBase
         if (IsDead) return;
 
         HandleMovement();
-        HandleAutoAttack();
+        //HandleAutoAttack();
     }
 
     #region Movement
@@ -92,12 +96,9 @@ public class InGameCharacter : EntityBase
     {
         if (_isInvincible) return;
 
-        // 피격 깜빡임
-        if (_spriteRenderer != null)
-        {
-            _spriteRenderer.DOColor(Color.red, 0.1f)
-                .OnComplete(() => _spriteRenderer.DOColor(Color.white, 0.1f));
-        }
+        // 피격 플래시 (셰이더 기반 흰색 플래시)
+        if (_hitFlash != null)
+            _hitFlash.Flash();
     }
 
     public override void Dead()

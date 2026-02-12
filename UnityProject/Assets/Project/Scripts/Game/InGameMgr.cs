@@ -45,12 +45,11 @@ public class InGameMgr : Singleton<InGameMgr>
     public void StartGame()
     {
         InGameCharacter = ObjectPoolMgr.Inst.Spawn<InGameCharacter>(InGameCharacterPath);
+        InGameCharacter.Initialize();
 
         CurrentWave = 0;
         KillCount = 0;
         _activeEnemies.Clear();
-
-        InGameMgr.Inst.InGameCharacter.Init();
 
         SetGameState(EGameState.Playing);
 

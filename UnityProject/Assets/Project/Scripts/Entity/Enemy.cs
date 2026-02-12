@@ -85,14 +85,9 @@ public class Enemy : EntityBase, IPoolingObject
     #region Damage / Death
     public override void OnHit(int damage)
     {
-        // 피격 플래시
-        if (_spriteRenderer != null)
-        {
-            _spriteRenderer.DOKill();
-            _spriteRenderer.color = Color.white;
-            _spriteRenderer.DOColor(Color.red, 0.05f)
-                .OnComplete(() => _spriteRenderer.DOColor(Color.white, 0.1f));
-        }
+        // 피격 플래시 (셰이더 기반 흰색 플래시)
+        if (_hitFlash != null)
+            _hitFlash.Flash();
 
         // 넉백
         if (_target != null)
@@ -113,40 +108,22 @@ public class Enemy : EntityBase, IPoolingObject
         // 경험치 지급
         InGameMgr.Inst.InGameCharacter.AddExp(GameConfig.EXP_PER_KILL);
 
-        // 사망 연출 후 회수
-        if (_spriteRenderer != null)
-        {
-            _spriteRenderer.DOKill();
-            _spriteRenderer.DOFade(0f, 0.3f).OnComplete(() =>
-            {
-                ObjectPoolMgr.Inst.Recycle(gameObject);
-            });
-        }
-        else
-        {
-            ObjectPoolMgr.Inst.Recycle(gameObject);
-        }
-
         InGameMgr.Inst.OnEnemyKilled(this);
+
+        ObjectPoolMgr.Inst.Recycle(gameObject);
     }
     #endregion
 
     #region Pooling
-    public void OnSpawn()
+    public override void OnSpawn()
     {
         // Init()에서 처리
     }
 
-    public void OnRecycle()
+    public override void OnRecycle()
     {
         _isDying = false;
         _target = null;
-
-        if (_spriteRenderer != null)
-        {
-            _spriteRenderer.DOKill();
-            _spriteRenderer.color = Color.white;
-        }
 
         transform.DOKill();
     }

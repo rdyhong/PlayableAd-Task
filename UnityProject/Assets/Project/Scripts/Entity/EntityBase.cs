@@ -9,6 +9,8 @@ public abstract class EntityBase : MonoBehaviour, IPoolingObject
     [Header("Stat")]
     public StatData Stat { get; protected set; }
 
+    protected HitFlash _hitFlash;
+    
     public bool IsDead => Stat != null && Stat.IsDead;
 
     public event Action<EntityBase> OnDeath;
@@ -20,6 +22,11 @@ public abstract class EntityBase : MonoBehaviour, IPoolingObject
     protected virtual void Awake()
     {
         
+    }
+
+    public virtual void Initialize()
+    {
+        _hitFlash = GetComponent<HitFlash>();
     }
 
     public virtual void InitStat(StatData stat)
