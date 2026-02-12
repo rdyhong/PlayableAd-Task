@@ -75,23 +75,27 @@ public class InGameMgr : Singleton<InGameMgr>
             CurrentWave++;
             CurrentMiniWave = 0;
 
-            while (CurrentMiniWave <= 3)
+            while (CurrentMiniWave < 3)
             {
                 CurrentMiniWave++;
 
-                int enemyCount = GameConfig.WAVE_BASE_ENEMY_COUNT + (CurrentWave - 1) * GameConfig.WAVE_ENEMY_INCREMENT;
+                int enemyCount = GameConfig.WAVE_BASE_ENEMY_COUNT + (CurrentWave - 1) * GameConfig.WAVE_ENEMY_INCREMENT + CurrentMiniWave;
                 float statMul = 1f + (CurrentWave - 1) * 0.15f;
 
                 yield return SpawnWave(enemyCount, statMul);
 
-                yield return new WaitForSeconds(GameConfig.MINIWAVE_INTERVAL);
-
                 // 모든 적 처치 대기
                 yield return new WaitUntil(() => MonsterMgr.Inst.SpawnedMonsterList.Count == 0 || GameState != EGameState.Playing);
+
+                yield return new WaitForSeconds(GameConfig.MINIWAVE_INTERVAL);
             }
 
-            // 웨이브 간 휴식
-            yield return new WaitForSeconds(GameConfig.WAVE_INTERVAL);
+            yield return InGameMain.Inst.MainUI.InGameUI.WaveOverCo(true);
+
+            CharacterMgr.Inst.InGameCharacter.ResetCharacter();
+            
+            yield return new WaitForSeconds(0.5f);
+            yield return InGameMain.Inst.MainUI.InGameUI.WaveOverCo(false);
         }
     }
 

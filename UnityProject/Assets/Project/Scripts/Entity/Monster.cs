@@ -84,11 +84,20 @@ public class Monster : EntityBase, IPoolingObject
         // 공격 판정
         if (_target != null && !_target.IsDead)
         {
-            _target.OnHit(Stat.atk, this);
+            //_target.OnHit(Stat.atk, this);
+            FireProjectile(_target);
         }
 
         // 공격 쿨다운 대기
         yield return new WaitForSeconds(Stat.attackCooldown);
+    }
+
+    private void FireProjectile(EntityBase target)
+    {
+        Vector3 dir = (target.transform.position - transform.position).normalized;
+
+        Projectile proj = ObjectPoolMgr.Inst.Spawn<Projectile>("Project/Prefabs/Effect/Projectile_1");
+        proj.Init(this, target, GameConfig.PLAYER_ATK + GameConfig.PLAYER_ATK_PER_FISH_GRADE * SlotData.HighstGrade, ArcType.Up);
     }
 
     #region Damage / Death

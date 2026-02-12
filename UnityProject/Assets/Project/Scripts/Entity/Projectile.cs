@@ -105,12 +105,13 @@ public class Projectile : MonoBehaviour, IPoolingObject
         // 데미지 처리
         if (_target != null && !_target.IsDead)
         {
-            var monster = _target as Monster;
-            if (monster != null)
-            {
-                monster.OnHit(_damage);
-                //InGameMgr.Inst.SpawnHitEffect(monster.transform.position);
-            }
+            _target.OnHit(_damage);
+            //var monster = _target as Monster;
+            //if (monster != null)
+            //{
+            //    monster.OnHit(_damage);
+            //    //InGameMgr.Inst.SpawnHitEffect(monster.transform.position);
+            //}
         }
 
         // 파티클 emit 중지 → 대기 동안 자연 소멸

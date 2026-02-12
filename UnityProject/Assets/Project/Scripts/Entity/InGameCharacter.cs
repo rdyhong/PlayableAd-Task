@@ -43,12 +43,13 @@ public class InGameCharacter : EntityBase
         StartCoroutine(LifeCycleCo());
     }
 
-    private void Update()
+    public void ResetCharacter()
     {
-        if(Keyboard.current.spaceKey.wasPressedThisFrame)
-        {
-            OnHit(1);
-        }
+        StopAllCoroutines();
+
+        transform.position = InGameMain.Inst.CachedPosition.CharacterPos;
+
+        StartCoroutine(LifeCycleCo());
     }
 
     private IEnumerator LifeCycleCo()

@@ -40,7 +40,7 @@ public static class GameConfig
 
     // 웨이브
     public const float WAVE_INTERVAL = 3f;
-    public const float MINIWAVE_INTERVAL = 3f;
+    public const float MINIWAVE_INTERVAL = 2f;
     public const int WAVE_BASE_ENEMY_COUNT = 3;
     public const int WAVE_ENEMY_INCREMENT = 1;
 
