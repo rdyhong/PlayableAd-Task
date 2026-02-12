@@ -23,6 +23,9 @@ public class InGameMgr : Singleton<InGameMgr>
     public int CurrentWave { get; private set; } = 0;
     public int KillCount { get; private set; } = 0;
 
+    // 인게임 캐릭터 참조
+    public InGameCharacter InGameCharacter { get; private set; } = null;
+
     // 활성 적 목록
     private List<Enemy> _activeEnemies = new List<Enemy>();
 
@@ -34,16 +37,20 @@ public class InGameMgr : Singleton<InGameMgr>
     public event Action<int> OnWaveChanged;
     public event Action<int> OnKillCountChanged;
 
+    private const string InGameCharacterPath = "Project/Prefabs/Character/InGameCharacter";
+
     /// <summary>
     /// 씬 진입 시 호출
     /// </summary>
     public void StartGame()
     {
+        InGameCharacter = ObjectPoolMgr.Inst.Spawn<InGameCharacter>(InGameCharacterPath);
+
         CurrentWave = 0;
         KillCount = 0;
         _activeEnemies.Clear();
 
-        InGameCharacter.Instance?.Init();
+        InGameMgr.Inst.InGameCharacter.Init();
 
         SetGameState(EGameState.Playing);
 
@@ -118,7 +125,7 @@ public class InGameMgr : Singleton<InGameMgr>
 
     private Vector3 GetRandomSpawnPosition()
     {
-        Vector3 playerPos = InGameCharacter.Instance != null ? InGameCharacter.Instance.transform.position : Vector3.zero;
+        Vector3 playerPos = Vector3.zero;
 
         float angle = UnityEngine.Random.Range(0f, 360f) * Mathf.Deg2Rad;
         float dist = UnityEngine.Random.Range(GameConfig.SPAWN_RADIUS_MIN, GameConfig.SPAWN_RADIUS_MAX);

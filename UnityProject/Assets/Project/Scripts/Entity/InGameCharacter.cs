@@ -7,8 +7,6 @@ using DG.Tweening;
 /// </summary>
 public class InGameCharacter : EntityBase
 {
-    public static InGameCharacter Instance { get; private set; }
-
     [Header("Level")]
     public int Level { get; private set; } = 1;
     public int Exp { get; private set; } = 0;
@@ -26,7 +24,6 @@ public class InGameCharacter : EntityBase
     protected override void Awake()
     {
         base.Awake();
-        Instance = this;
         _cachedTransform = transform;
     }
 

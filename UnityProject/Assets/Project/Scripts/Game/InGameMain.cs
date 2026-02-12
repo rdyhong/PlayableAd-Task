@@ -2,15 +2,18 @@ using UnityEngine;
 
 public class InGameMain : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public InGameMainUI MainUI => _mainUI;
+    [SerializeField] private InGameMainUI _mainUI;
+
     void Start()
     {
-        
+        Initialize();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Initialize()
     {
-        
+        MainUI.Initialize();
+
+        InGameMgr.Inst.StartGame();
     }
 }

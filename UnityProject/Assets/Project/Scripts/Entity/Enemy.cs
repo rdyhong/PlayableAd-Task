@@ -31,7 +31,7 @@ public class Enemy : EntityBase, IPoolingObject
 
         _attackTimer = 0f;
         _isDying = false;
-        _target = InGameCharacter.Instance?.transform;
+        _target = InGameMgr.Inst.InGameCharacter.transform;
 
         if (_spriteRenderer != null)
             _spriteRenderer.color = Color.white;
@@ -111,7 +111,7 @@ public class Enemy : EntityBase, IPoolingObject
         base.Die();
 
         // 경험치 지급
-        InGameCharacter.Instance?.AddExp(GameConfig.EXP_PER_KILL);
+        InGameMgr.Inst.InGameCharacter.AddExp(GameConfig.EXP_PER_KILL);
 
         // 사망 연출 후 회수
         if (_spriteRenderer != null)

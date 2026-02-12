@@ -19,8 +19,7 @@ public abstract class EntityBase : MonoBehaviour, IPoolingObject
 
     protected virtual void Awake()
     {
-        _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        _animator = GetComponentInChildren<Animator>();
+        
     }
 
     public virtual void InitStat(StatData stat)
