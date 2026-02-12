@@ -47,7 +47,7 @@ public class Projectile : MonoBehaviour, IPoolingObject
 
         if (other.CompareTag("Enemy"))
         {
-            var enemy = other.GetComponent<Enemy>();
+            var enemy = other.GetComponent<Monster>();
             if (enemy != null && !enemy.IsDead)
             {
                 enemy.TakeDamage(_damage);

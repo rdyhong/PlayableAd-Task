@@ -4,9 +4,9 @@ using DG.Tweening;
 /// <summary>
 /// 적 — 플레이어 추적, 근접 공격, 사망 시 풀링 회수
 /// </summary>
-public class Enemy : EntityBase, IPoolingObject
+public class Monster : EntityBase, IPoolingObject
 {
-    private Transform _target;
+    private EntityBase _target;
     private float _attackTimer;
     private bool _isDying;
 
@@ -31,7 +31,7 @@ public class Enemy : EntityBase, IPoolingObject
 
         _attackTimer = 0f;
         _isDying = false;
-        _target = InGameMgr.Inst.InGameCharacter.transform;
+        _target = InGameMgr.Inst.InGameCharacter;
 
         if (_spriteRenderer != null)
             _spriteRenderer.color = Color.white;
@@ -49,7 +49,7 @@ public class Enemy : EntityBase, IPoolingObject
     #region AI
     private void ChaseTarget()
     {
-        Vector3 dir = (_target.position - transform.position).normalized;
+        Vector3 dir = (_target.transform.position - transform.position).normalized;
         transform.position += dir * Stat.moveSpeed * TimeMgr.ObjDeltaTime;
 
         FlipSprite(dir.x);
@@ -62,7 +62,7 @@ public class Enemy : EntityBase, IPoolingObject
     {
         _attackTimer += TimeMgr.ObjDeltaTime;
 
-        float dist = Vector3.Distance(transform.position, _target.position);
+        float dist = Vector3.Distance(transform.position, _target.transform.position);
         if (dist > Stat.attackRange) return;
         if (_attackTimer < Stat.attackCooldown) return;
 
@@ -92,7 +92,7 @@ public class Enemy : EntityBase, IPoolingObject
         // 넉백
         if (_target != null)
         {
-            Vector3 knockDir = (transform.position - _target.position).normalized;
+            Vector3 knockDir = (transform.position - _target.transform.position).normalized;
             transform.DOMove(transform.position + knockDir * 0.3f, 0.1f);
         }
 

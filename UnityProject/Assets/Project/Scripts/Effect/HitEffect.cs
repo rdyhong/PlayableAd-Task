@@ -1,40 +1,51 @@
+using System.Collections;
 using UnityEngine;
-using DG.Tweening;
 
 /// <summary>
-/// 피격 이펙트 — 스케일+페이드 후 회수
+/// 피격 이펙트 — ParticleSystem 재생 후 duration 대기하고 풀 회수
 /// </summary>
 public class HitEffect : MonoBehaviour, IPoolingObject
 {
-    [SerializeField] private SpriteRenderer _sprite;
-    private Sequence _seq;
+    [SerializeField] private ParticleSystem _particle;
+
+    private Coroutine _recycleCoroutine;
 
     public void Play(Vector3 position)
     {
         transform.position = position;
-        transform.localScale = Vector3.zero;
 
-        if (_sprite == null)
-            _sprite = GetComponent<SpriteRenderer>();
+        if (_particle == null)
+            _particle = GetComponent<ParticleSystem>();
 
-        if (_sprite != null)
-            _sprite.color = Color.white;
+        if (_particle == null) return;
 
-        _seq?.Kill();
-        _seq = DOTween.Sequence();
-        _seq.Append(transform.DOScale(1f, GameConfig.HIT_EFFECT_DURATION * 0.4f).SetEase(Ease.OutBack));
-        _seq.Append(transform.DOScale(0f, GameConfig.HIT_EFFECT_DURATION * 0.6f).SetEase(Ease.InQuad));
-        _seq.OnComplete(() =>
-        {
-            ObjectPoolMgr.Inst.Recycle(gameObject);
-        });
+        _particle.Clear();
+        _particle.Play();
+
+        if (_recycleCoroutine != null)
+            StopCoroutine(_recycleCoroutine);
+
+        _recycleCoroutine = StartCoroutine(RecycleAfterDuration());
+    }
+
+    private IEnumerator RecycleAfterDuration()
+    {
+        yield return new WaitForSeconds(_particle.main.duration + _particle.main.startLifetime.constantMax);
+        ObjectPoolMgr.Inst.Recycle(gameObject);
+        _recycleCoroutine = null;
     }
 
     public void OnSpawn() { }
 
     public void OnRecycle()
     {
-        _seq?.Kill();
-        transform.localScale = Vector3.zero;
+        if (_recycleCoroutine != null)
+        {
+            StopCoroutine(_recycleCoroutine);
+            _recycleCoroutine = null;
+        }
+
+        if (_particle != null)
+            _particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 }

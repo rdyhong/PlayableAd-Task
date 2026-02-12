@@ -19,8 +19,11 @@ public class InGameMain : MonoBehaviour
 
     private void Initialize()
     {
+        InGameMgr.Inst.Initialize();
+
         MainUI.Initialize();
 
+        // Start Game
         InGameMgr.Inst.StartGame();
     }
 }

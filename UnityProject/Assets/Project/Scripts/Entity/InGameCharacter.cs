@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// 플레이어 — 조이스틱 이동, 자동공격, 레벨업
@@ -16,7 +17,6 @@ public class InGameCharacter : EntityBase
     public event Action<int, int> OnExpChanged; // cur, max
 
     private float _attackTimer;
-    private bool _isInvincible;
 
     // 캐싱
     private Transform _cachedTransform;
@@ -38,12 +38,16 @@ public class InGameCharacter : EntityBase
         Exp = 0;
         ExpToNextLevel = GameConfig.EXP_BASE_REQUIRED;
         _attackTimer = 0f;
-        _isInvincible = false;
     }
 
     private void Update()
     {
         if (IsDead) return;
+
+        if(Keyboard.current.spaceKey.wasPressedThisFrame)
+        {
+            OnHit(1);
+        }
 
         HandleMovement();
         //HandleAutoAttack();
@@ -94,7 +98,7 @@ public class InGameCharacter : EntityBase
     #region Damage / Death
     public override void OnHit(int damage)
     {
-        if (_isInvincible) return;
+        base.OnHit(damage);
 
         // 피격 플래시 (셰이더 기반 흰색 플래시)
         if (_hitFlash != null)

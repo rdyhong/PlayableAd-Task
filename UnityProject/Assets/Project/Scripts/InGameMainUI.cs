@@ -2,10 +2,11 @@ using UnityEngine;
 
 public class InGameMainUI : MonoBehaviour
 {
-    //[SerializeField] private ingame
+    public InGameUI InGameUI => _inGameUI;
+    [SerializeField] private InGameUI _inGameUI;
 
     public void Initialize()
     {
-
+        InGameUI.Initialize();
     }
 }

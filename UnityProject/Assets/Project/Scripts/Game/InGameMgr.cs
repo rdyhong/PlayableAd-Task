@@ -27,7 +27,7 @@ public class InGameMgr : Singleton<InGameMgr>
     public InGameCharacter InGameCharacter { get; private set; } = null;
 
     // 활성 적 목록
-    private List<Enemy> _activeEnemies = new List<Enemy>();
+    private List<Monster> _activeEnemies = new List<Monster>();
 
     // 웨이브 코루틴
     private Coroutine _waveCoroutine;
@@ -38,6 +38,11 @@ public class InGameMgr : Singleton<InGameMgr>
     public event Action<int> OnKillCountChanged;
 
     private const string InGameCharacterPath = "Project/Prefabs/Character/InGameCharacter";
+
+    public void Initialize()
+    {
+
+    }
 
     /// <summary>
     /// 씬 진입 시 호출
@@ -106,7 +111,7 @@ public class InGameMgr : Singleton<InGameMgr>
         {
             if (GameState != EGameState.Playing) yield break;
 
-            SpawnEnemy(statMultiplier);
+            //SpawnEnemy(statMultiplier);
             yield return new WaitForSeconds(GameConfig.SPAWN_INTERVAL);
         }
     }
@@ -115,7 +120,7 @@ public class InGameMgr : Singleton<InGameMgr>
     {
         Vector3 spawnPos = GetRandomSpawnPosition();
 
-        Enemy enemy = ObjectPoolMgr.Inst.Spawn<Enemy>("Prefabs/Game/Enemy");
+        Monster enemy = ObjectPoolMgr.Inst.Spawn<Monster>("Prefabs/Game/Enemy");
         enemy.transform.position = spawnPos;
         enemy.Init(statMultiplier);
 
@@ -134,7 +139,7 @@ public class InGameMgr : Singleton<InGameMgr>
     #endregion
 
     #region Enemy Management
-    public void OnEnemyKilled(Enemy enemy)
+    public void OnEnemyKilled(Monster enemy)
     {
         _activeEnemies.Remove(enemy);
         KillCount++;
