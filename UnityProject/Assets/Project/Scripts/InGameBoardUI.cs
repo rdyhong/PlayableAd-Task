@@ -6,6 +6,9 @@ public class InGameBoardUI : MonoBehaviour
     public Dictionary<Vector2Int, IngameBoardSlot> SlotDict { get; private set; } = new Dictionary<Vector2Int, IngameBoardSlot>();
     [SerializeField] private IngameBoardSlot[] _slots;
 
+    public RectTransform RtCellsParent => _rtCellsParent;
+    [SerializeField] private RectTransform _rtCellsParent;
+
     private const int ROW_COUNT = 4;
     private const int COL_COUNT = 10;
 
