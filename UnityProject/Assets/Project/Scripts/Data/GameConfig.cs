@@ -16,6 +16,7 @@ public static class GameConfig
     public const float PLAYER_ATTACK_RANGE = 10f;
     public const int PLAYER_MAX_HP = 500;
     public const int PLAYER_ATK = 1;
+    public const int PLAYER_ATK_PER_FISH_GRADE = 10;
 
     // 적
     public const float ENEMY_MOVE_SPEED = 2f;
@@ -39,6 +40,7 @@ public static class GameConfig
 
     // 웨이브
     public const float WAVE_INTERVAL = 3f;
+    public const float MINIWAVE_INTERVAL = 3f;
     public const int WAVE_BASE_ENEMY_COUNT = 3;
     public const int WAVE_ENEMY_INCREMENT = 1;
 

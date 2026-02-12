@@ -96,6 +96,8 @@ public class SlotData
     public int Grade { get; private set; } = 0;
     public bool IsLock { get; private set; } = false;
 
+    public static int HighstGrade = 1;
+
     public SlotData(IngameBoardSlot boardSlot, Vector2Int coord)
     {
         BoardSlot = boardSlot;
@@ -159,6 +161,9 @@ public class SlotData
         SlotCell.Rt.localScale = Vector3.one;
         SlotCell.Rt.anchoredPosition3D = BoardSlot.Rt.anchoredPosition3D;
         Grade++;
+
+        if(HighstGrade < Grade) HighstGrade = Grade;
+
         BoardSlot.UpgradeSlot(Grade);
 
         EffectBase eff = ObjectPoolMgr.Inst.Spawn<EffectBase>("Project/Prefabs/UI/Effects/MergeEffectUI");

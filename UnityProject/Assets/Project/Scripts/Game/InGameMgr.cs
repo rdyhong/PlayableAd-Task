@@ -21,15 +21,11 @@ public class InGameMgr : Singleton<InGameMgr>
 
     [Header("Wave")]
     public int CurrentWave { get; private set; } = 0;
+    public int CurrentMiniWave { get; private set; } = 0;
     public int KillCount { get; private set; } = 0;
 
     // 웨이브 코루틴
     private Coroutine _waveCoroutine;
-
-    // 이벤트
-    public event Action<EGameState> OnGameStateChanged;
-    public event Action<int> OnWaveChanged;
-    public event Action<int> OnKillCountChanged;
 
     public void Initialize()
     {
@@ -66,7 +62,6 @@ public class InGameMgr : Singleton<InGameMgr>
     private void SetGameState(EGameState state)
     {
         GameState = state;
-        OnGameStateChanged?.Invoke(state);
     }
 
     #region Wave System
@@ -78,17 +73,22 @@ public class InGameMgr : Singleton<InGameMgr>
         while (GameState == EGameState.Playing)
         {
             CurrentWave++;
-            OnWaveChanged?.Invoke(CurrentWave);
+            CurrentMiniWave = 0;
 
-            int enemyCount = GameConfig.WAVE_BASE_ENEMY_COUNT + (CurrentWave - 1) * GameConfig.WAVE_ENEMY_INCREMENT;
-            float statMul = 1f + (CurrentWave - 1) * 0.15f;
+            while (CurrentMiniWave <= 3)
+            {
+                CurrentMiniWave++;
 
-            yield return SpawnWave(enemyCount, statMul);
+                int enemyCount = GameConfig.WAVE_BASE_ENEMY_COUNT + (CurrentWave - 1) * GameConfig.WAVE_ENEMY_INCREMENT;
+                float statMul = 1f + (CurrentWave - 1) * 0.15f;
 
-            // 모든 적 처치 대기
-            //yield return new WaitUntil(() => _activeEnemies.Count == 0 || GameState != EGameState.Playing);
+                yield return SpawnWave(enemyCount, statMul);
 
-            if (GameState != EGameState.Playing) break;
+                yield return new WaitForSeconds(GameConfig.MINIWAVE_INTERVAL);
+
+                // 모든 적 처치 대기
+                yield return new WaitUntil(() => MonsterMgr.Inst.SpawnedMonsterList.Count == 0 || GameState != EGameState.Playing);
+            }
 
             // 웨이브 간 휴식
             yield return new WaitForSeconds(GameConfig.WAVE_INTERVAL);
