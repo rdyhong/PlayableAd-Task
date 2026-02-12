@@ -89,7 +89,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 455184, guid: 29b0b627c85f5e94b83fbe9f44272436, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 455184, guid: 29b0b627c85f5e94b83fbe9f44272436, type: 3}
       propertyPath: m_LocalRotation.w
@@ -168,15 +168,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 495512, guid: 9902f48ac1851694fb6332b1472ec09a, type: 3}
       propertyPath: m_LocalScale.x
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 495512, guid: 9902f48ac1851694fb6332b1472ec09a, type: 3}
       propertyPath: m_LocalScale.y
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 495512, guid: 9902f48ac1851694fb6332b1472ec09a, type: 3}
       propertyPath: m_LocalScale.z
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 495512, guid: 9902f48ac1851694fb6332b1472ec09a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -221,6 +221,26 @@ PrefabInstance:
     - target: {fileID: 495512, guid: 9902f48ac1851694fb6332b1472ec09a, type: 3}
       propertyPath: m_ConstrainProportionsScale
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 19810838, guid: 9902f48ac1851694fb6332b1472ec09a, type: 3}
+      propertyPath: simulationSpeed
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 19866398, guid: 9902f48ac1851694fb6332b1472ec09a, type: 3}
+      propertyPath: simulationSpeed
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 19866398, guid: 9902f48ac1851694fb6332b1472ec09a, type: 3}
+      propertyPath: InitialModule.startRotationX.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 19866398, guid: 9902f48ac1851694fb6332b1472ec09a, type: 3}
+      propertyPath: InitialModule.startRotationY.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 19894078, guid: 9902f48ac1851694fb6332b1472ec09a, type: 3}
+      propertyPath: simulationSpeed
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
