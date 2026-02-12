@@ -3,10 +3,14 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
 using TMPro;
+using UnityEngine.UI;
 
 public class IngameBoardSlot : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
 {
     [SerializeField] private TextMeshProUGUI _txtGrade;
+
+    [SerializeField] private GameObject _lockGo;
+    [SerializeField] private Button _btnUnlock;
 
     private SlotData _cachedSlotData;
 
@@ -19,8 +23,27 @@ public class IngameBoardSlot : MonoBehaviour, IPointerDownHandler, IDragHandler,
     public void Initialize(SlotData slotData)
     {
         Rt = GetComponent<RectTransform>();
+        _btnUnlock.onClick.AddListener(OnClickUnlock);
+
         _cachedSlotData = slotData;
         _txtGrade.text = string.Empty;
+    }
+
+    private void OnClickUnlock()
+    {
+        _cachedSlotData.Unclock();
+    }
+
+    public void SetLock(bool isLock)
+    {
+        _lockGo.SetActive(isLock);
+        _btnUnlock.gameObject.SetActive(false);
+    }
+
+    public void SetUnlockable()
+    {
+        _lockGo.SetActive(false);
+        _btnUnlock.gameObject.SetActive(true);
     }
 
     public void CreateSlotCell(int grade)

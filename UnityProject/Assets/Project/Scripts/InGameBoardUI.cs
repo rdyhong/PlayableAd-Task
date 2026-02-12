@@ -21,7 +21,10 @@ public class InGameBoardUI : MonoBehaviour
         {
             Vector2Int coord = new Vector2Int(i % COL_COUNT, i / COL_COUNT);
             SlotDict.Add(coord, new SlotData(_slots[i], coord, 1));
+            SlotDict[coord].SetLock(COL_COUNT <= i);
         }
+
+        SetUnlockableSlot();
 
         _btnSpawn.onClick.AddListener(OnClickSpawn);
     }
@@ -30,25 +33,46 @@ public class InGameBoardUI : MonoBehaviour
     {
         SlotData emptySlot = null;
 
+        bool breakFlag = false;
+
         for (int y = 0; y < ROW_COUNT; y++)
         {
             for(int x = 0; x < COL_COUNT; x++)
             {
                 Vector2Int coord = new Vector2Int(x, y);
 
-                if (SlotDict[coord].SlotCell == null)
+                if (SlotDict[coord].IsLock)
+                {
+                    breakFlag = true;
+                }
+                else if( SlotDict[coord].SlotCell == null)
                 {
                     emptySlot = SlotDict[coord];
-                    break;
+                    breakFlag = true;
                 }
+
+                if (breakFlag) break;
             }
 
-            if (emptySlot != null) break;
+            if (breakFlag) break;
         }
 
         if(emptySlot != null)
         {
             emptySlot.CreateSlotCell();
+        }
+    }
+
+    public void SetUnlockableSlot()
+    {
+        for (int i = 0; i < _slots.Length; i++)
+        {
+            Vector2Int coord = new Vector2Int(i % COL_COUNT, i / COL_COUNT);
+            if(SlotDict[coord].IsLock)
+            {
+                SlotDict[coord].SetUnlockable();
+                break;
+            }
         }
     }
 }
@@ -60,6 +84,7 @@ public class SlotData
     public IngameBoardSlotCell SlotCell { get; private set; }
     public Vector2Int Coord { get; private set; } = Vector2Int.zero;
     public int Grade { get; private set; } = 0;
+    public bool IsLock { get; private set; } = false;
 
     public SlotData(IngameBoardSlot boardSlot, Vector2Int coord, int grade)
     {
@@ -67,6 +92,25 @@ public class SlotData
         Coord = coord;
         Grade = grade;
         BoardSlot.Initialize(this);
+    }
+
+    public void SetLock(bool isLock)
+    {
+        IsLock  = isLock;
+        BoardSlot.SetLock(isLock);
+    }
+
+    public void SetUnlockable()
+    {
+        IsLock = true;
+        BoardSlot.SetUnlockable();
+    }
+
+    public void Unclock()
+    {
+        IsLock = false;
+        BoardSlot.SetLock(false);
+        InGameMain.Inst.MainUI.InGameUI.BoardUI.SetUnlockableSlot();
     }
 
     public void ClearSlot()
