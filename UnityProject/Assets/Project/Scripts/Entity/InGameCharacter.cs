@@ -56,18 +56,10 @@ public class InGameCharacter : EntityBase
     #region Movement
     private void HandleMovement()
     {
-        Vector3 dir = InputMgr.StickDir;
-        float weight = InputMgr.StickWeight;
+        Vector3 moveDir = Vector3.right;
+        _cachedTransform.position += moveDir * Stat.moveSpeed * TimeMgr.ObjDeltaTime;
 
-        if (weight <= 0) return;
-
-        Vector3 moveDir = dir.normalized;
-        _cachedTransform.position += moveDir * Stat.moveSpeed * weight * TimeMgr.ObjDeltaTime;
-
-        FlipSprite(moveDir.x);
-
-        if (_animator != null)
-            _animator.SetBool("IsMoving", weight > 0.1f);
+        _animController.PlayAnim(EAnimType.Walk);
     }
     #endregion
 
@@ -108,8 +100,8 @@ public class InGameCharacter : EntityBase
     public override void Dead()
     {
         base.Dead();
-        if (_animator != null)
-            _animator.SetTrigger("Die");
+
+        _animController.PlayAnim(EAnimType.Death);
 
         // GameOver 통보
         InGameMgr.Inst.OnPlayerDead();

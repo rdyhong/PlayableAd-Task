@@ -23,9 +23,6 @@ public class InGameMgr : Singleton<InGameMgr>
     public int CurrentWave { get; private set; } = 0;
     public int KillCount { get; private set; } = 0;
 
-    // 인게임 캐릭터 참조
-    public InGameCharacter InGameCharacter { get; private set; } = null;
-
     // 활성 적 목록
     private List<Monster> _activeEnemies = new List<Monster>();
 
@@ -37,8 +34,6 @@ public class InGameMgr : Singleton<InGameMgr>
     public event Action<int> OnWaveChanged;
     public event Action<int> OnKillCountChanged;
 
-    private const string InGameCharacterPath = "Project/Prefabs/Character/InGameCharacter";
-
     public void Initialize()
     {
 
@@ -49,14 +44,13 @@ public class InGameMgr : Singleton<InGameMgr>
     /// </summary>
     public void StartGame()
     {
-        InGameCharacter = ObjectPoolMgr.Inst.Spawn<InGameCharacter>(InGameCharacterPath);
-        InGameCharacter.Initialize();
-
         CurrentWave = 0;
         KillCount = 0;
         _activeEnemies.Clear();
 
         SetGameState(EGameState.Playing);
+
+        CharacterMgr.Inst.Initialize();
 
         _waveCoroutine = StartCoroutine(WaveLoop());
     }

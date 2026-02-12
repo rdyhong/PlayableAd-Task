@@ -3,12 +3,15 @@ using UnityEngine;
 
 public class CharacterMgr : Singleton<CharacterMgr>
 {
-    public List<EntityBase> SpawnedMonster { get; private set; } = new List<EntityBase>();
+    public InGameCharacter InGameCharacter { get; private set; } = null;
+
+    private const string InGameCharacterPath = "Project/Prefabs/Character/InGameCharacter";
 
     public void Initialize()
     {
-        SpawnedMonster.Clear();
-
+        InGameCharacter = ObjectPoolMgr.Inst.Spawn<InGameCharacter>(InGameCharacterPath);
+        InGameCharacter.Initialize();
+        InGameMain.Inst.CamController.SetCameraTarget(InGameCharacter.transform);
 
     }
 }

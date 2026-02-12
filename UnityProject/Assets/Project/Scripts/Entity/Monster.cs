@@ -31,10 +31,7 @@ public class Monster : EntityBase, IPoolingObject
 
         _attackTimer = 0f;
         _isDying = false;
-        _target = InGameMgr.Inst.InGameCharacter;
-
-        if (_spriteRenderer != null)
-            _spriteRenderer.color = Color.white;
+        _target = CharacterMgr.Inst.InGameCharacter;
     }
 
     private void Update()
@@ -51,11 +48,6 @@ public class Monster : EntityBase, IPoolingObject
     {
         Vector3 dir = (_target.transform.position - transform.position).normalized;
         transform.position += dir * Stat.moveSpeed * TimeMgr.ObjDeltaTime;
-
-        FlipSprite(dir.x);
-
-        if (_animator != null)
-            _animator.SetBool("IsMoving", true);
     }
 
     private void TryAttack()
@@ -77,8 +69,6 @@ public class Monster : EntityBase, IPoolingObject
         var player = _target.GetComponent<InGameCharacter>();
         player?.TakeDamage(Stat.atk, this);
 
-        if (_animator != null)
-            _animator.SetTrigger("Attack");
     }
     #endregion
 
@@ -106,7 +96,7 @@ public class Monster : EntityBase, IPoolingObject
         base.Dead();
 
         // 경험치 지급
-        InGameMgr.Inst.InGameCharacter.AddExp(GameConfig.EXP_PER_KILL);
+        CharacterMgr.Inst.InGameCharacter.AddExp(GameConfig.EXP_PER_KILL);
 
         InGameMgr.Inst.OnEnemyKilled(this);
 

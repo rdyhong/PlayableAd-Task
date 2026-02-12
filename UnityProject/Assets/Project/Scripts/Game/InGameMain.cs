@@ -4,6 +4,9 @@ public class InGameMain : MonoBehaviour
 {
     public static InGameMain Inst { get; private set; } = null;
 
+    public InGameCamController CamController => _camController;
+    [SerializeField] private InGameCamController _camController;
+
     public InGameMainUI MainUI => _mainUI;
     [SerializeField] private InGameMainUI _mainUI;
 

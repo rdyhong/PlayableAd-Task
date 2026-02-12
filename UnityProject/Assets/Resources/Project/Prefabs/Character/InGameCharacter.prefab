@@ -43,6 +43,7 @@ GameObject:
   - component: {fileID: 8057207315461825550}
   - component: {fileID: 5201757777271693068}
   - component: {fileID: 8431808751653664733}
+  - component: {fileID: 9193339335943759479}
   m_Layer: 0
   m_Name: InGameCharacter
   m_TagString: Untagged
@@ -79,8 +80,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InGameCharacter
   _spriteRenderer: {fileID: 0}
-  _animator: {fileID: 0}
-  _hitFlash: {fileID: 8431808751653664733}
+  _animController: {fileID: 0}
 --- !u!114 &8431808751653664733
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -94,6 +94,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HitFlash
   _flashDuration: 0.12
+--- !u!114 &9193339335943759479
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 396420207010823042}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79b6d532f646fda4a8a435accb03f2fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AnimController
+  _animator: {fileID: 8527544439129553621}
 --- !u!1001 &5669681897524660209
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -215,6 +228,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ebea5f8b8163f9a4ab9d9a1b45444e28, type: 3}
+--- !u!95 &8527544439129553621 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 4105362945620786468, guid: ebea5f8b8163f9a4ab9d9a1b45444e28, type: 3}
+  m_PrefabInstance: {fileID: 5669681897524660209}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8527544439129553622 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4105362945620786471, guid: ebea5f8b8163f9a4ab9d9a1b45444e28, type: 3}

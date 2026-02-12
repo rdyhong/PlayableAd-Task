@@ -16,8 +16,7 @@ public abstract class EntityBase : MonoBehaviour, IPoolingObject
     public event Action<EntityBase> OnDeath;
     public event Action<EntityBase, int> OnDamaged;
 
-    [SerializeField] protected SpriteRenderer _spriteRenderer;
-    [SerializeField] protected Animator _animator;
+    protected AnimController _animController;
 
     protected virtual void Awake()
     {
@@ -26,6 +25,8 @@ public abstract class EntityBase : MonoBehaviour, IPoolingObject
 
     public virtual void Initialize()
     {
+        _animController = GetComponent<AnimController>();
+
         _hitFlash = GetComponent<HitFlash>();
     }
 
@@ -63,17 +64,6 @@ public abstract class EntityBase : MonoBehaviour, IPoolingObject
     public virtual void Dead()
     {
         OnDeath?.Invoke(this);
-    }
-
-    /// <summary>
-    /// 스프라이트 방향 전환
-    /// </summary>
-    protected void FlipSprite(float dirX)
-    {
-        if (_spriteRenderer == null) return;
-        if (dirX == 0) return;
-
-        _spriteRenderer.flipX = dirX < 0;
     }
 
     public virtual void OnSpawn()
