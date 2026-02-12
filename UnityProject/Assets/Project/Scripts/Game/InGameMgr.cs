@@ -23,9 +23,6 @@ public class InGameMgr : Singleton<InGameMgr>
     public int CurrentWave { get; private set; } = 0;
     public int KillCount { get; private set; } = 0;
 
-    // 활성 적 목록
-    private List<Monster> _activeEnemies = new List<Monster>();
-
     // 웨이브 코루틴
     private Coroutine _waveCoroutine;
 
@@ -46,7 +43,6 @@ public class InGameMgr : Singleton<InGameMgr>
     {
         CurrentWave = 0;
         KillCount = 0;
-        _activeEnemies.Clear();
 
         SetGameState(EGameState.Playing);
 
@@ -90,7 +86,7 @@ public class InGameMgr : Singleton<InGameMgr>
             yield return SpawnWave(enemyCount, statMul);
 
             // 모든 적 처치 대기
-            yield return new WaitUntil(() => _activeEnemies.Count == 0 || GameState != EGameState.Playing);
+            //yield return new WaitUntil(() => _activeEnemies.Count == 0 || GameState != EGameState.Playing);
 
             if (GameState != EGameState.Playing) break;
 
@@ -105,20 +101,9 @@ public class InGameMgr : Singleton<InGameMgr>
         {
             if (GameState != EGameState.Playing) yield break;
 
-            //SpawnEnemy(statMultiplier);
+            MonsterMgr.Inst.SpawnMonster();
             yield return new WaitForSeconds(GameConfig.SPAWN_INTERVAL);
         }
-    }
-
-    private void SpawnEnemy(float statMultiplier)
-    {
-        Vector3 spawnPos = GetRandomSpawnPosition();
-
-        Monster enemy = ObjectPoolMgr.Inst.Spawn<Monster>("Prefabs/Game/Enemy");
-        enemy.transform.position = spawnPos;
-        enemy.Init(statMultiplier);
-
-        _activeEnemies.Add(enemy);
     }
 
     private Vector3 GetRandomSpawnPosition()
@@ -129,42 +114,6 @@ public class InGameMgr : Singleton<InGameMgr>
         float dist = UnityEngine.Random.Range(GameConfig.SPAWN_RADIUS_MIN, GameConfig.SPAWN_RADIUS_MAX);
 
         return playerPos + new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0) * dist;
-    }
-    #endregion
-
-    #region Enemy Management
-    public void OnEnemyKilled(Monster enemy)
-    {
-        _activeEnemies.Remove(enemy);
-        KillCount++;
-        OnKillCountChanged?.Invoke(KillCount);
-    }
-
-    /// <summary>
-    /// 가장 가까운 적 Transform 반환
-    /// </summary>
-    public Transform GetNearestEnemy(Vector3 position, float maxRange)
-    {
-        Transform nearest = null;
-        float nearestDist = maxRange;
-
-        for (int i = _activeEnemies.Count - 1; i >= 0; i--)
-        {
-            if (_activeEnemies[i] == null || _activeEnemies[i].IsDead)
-            {
-                _activeEnemies.RemoveAt(i);
-                continue;
-            }
-
-            float dist = Vector3.Distance(position, _activeEnemies[i].transform.position);
-            if (dist < nearestDist)
-            {
-                nearestDist = dist;
-                nearest = _activeEnemies[i].transform;
-            }
-        }
-
-        return nearest;
     }
     #endregion
 

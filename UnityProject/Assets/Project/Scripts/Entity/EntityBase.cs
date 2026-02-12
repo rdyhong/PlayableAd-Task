@@ -6,15 +6,14 @@ using UnityEngine;
 /// </summary>
 public abstract class EntityBase : MonoBehaviour, IPoolingObject
 {
+    [SerializeField] protected Transform _bodyRoot;
+
     [Header("Stat")]
     public StatData Stat { get; protected set; }
 
     protected HitFlash _hitFlash;
     
     public bool IsDead => Stat != null && Stat.IsDead;
-
-    public event Action<EntityBase> OnDeath;
-    public event Action<EntityBase, int> OnDamaged;
 
     protected AnimController _animController;
 
@@ -45,25 +44,34 @@ public abstract class EntityBase : MonoBehaviour, IPoolingObject
         int actualDamage = Mathf.Max(1, damage);
         Stat.TakeDamage(actualDamage);
 
-        OnDamaged?.Invoke(this, actualDamage);
         OnHit(actualDamage);
 
         if (IsDead)
         {
-            Dead();
+            OnDead();
         }
 
         return actualDamage;
     }
 
-    public virtual void OnHit(int damage)
+    public virtual void OnHit(int damage, EntityBase attacker = null)
     {
-        // 피격 연출 (자식에서 override)
+        if (IsDead) return;
+
+        // 피격 플래시 (셰이더 기반 흰색 플래시)   
+        _hitFlash.Flash();
+
+        Stat.TakeDamage(damage);
+
+        if (IsDead)
+        {
+            OnDead();
+        }
     }
 
-    public virtual void Dead()
+    public virtual void OnDead()
     {
-        OnDeath?.Invoke(this);
+
     }
 
     public virtual void OnSpawn()

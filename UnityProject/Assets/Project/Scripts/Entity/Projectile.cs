@@ -1,81 +1,137 @@
 using UnityEngine;
 
+public enum ArcType { Up, Down }
+
 /// <summary>
-/// 투사체 — 직선 이동, 적 충돌 시 데미지, 풀링 연동
+/// 투사체 — 곡선 이동, 타겟 추적, 도달 시 1초 대기 후 회수
 /// </summary>
 public class Projectile : MonoBehaviour, IPoolingObject
 {
-    private Vector3 _direction;
-    private float _speed;
+    private EntityBase _target;
     private int _damage;
     private float _lifeTimer;
     private bool _isActive;
+    private bool _isWaitingRecycle;
 
-    // 관통 여부 (추후 확장)
-    [SerializeField] private bool _isPiercing = false;
+    private Vector3 _startPos;
+    private float _elapsed;
+    private float _duration;
+    private float _resolvedArcHeight;
+    private float _recycleTimer;
 
-    public void Init(Vector3 startPos, Vector3 direction, int damage)
+    [SerializeField] private float _arcHeight = 2f;
+    [SerializeField] private float _arcRandomRange = 0.5f;
+    [SerializeField] private float _recycleDelay = 1f;
+    [SerializeField] private ParticleSystem _trail;
+
+    public void Init(EntityBase startEntity, EntityBase targetEntity, int damage, ArcType arcType = ArcType.Up)
     {
-        transform.position = startPos;
-        _direction = direction.normalized;
-        _speed = GameConfig.PROJECTILE_SPEED;
+        _startPos = startEntity.transform.position;
+        transform.position = _startPos;
+        _target = targetEntity;
         _damage = damage;
-        _lifeTimer = GameConfig.PROJECTILE_LIFETIME;
+        _elapsed = 0f;
+        _duration = GameConfig.PROJECTILE_LIFETIME;
+        _lifeTimer = _duration;
         _isActive = true;
+        _isWaitingRecycle = false;
 
-        // 회전 — 발사 방향으로
-        float angle = Mathf.Atan2(_direction.y, _direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle);
+        float randomOffset = Random.Range(-_arcRandomRange, _arcRandomRange);
+        _resolvedArcHeight = arcType == ArcType.Up
+            ? _arcHeight + randomOffset
+            : -(_arcHeight + randomOffset);
+
+        if (_trail != null)
+        {
+            _trail.Clear();
+            _trail.Play();
+        }
     }
 
     private void Update()
     {
+        if (_isWaitingRecycle)
+        {
+            _recycleTimer -= TimeMgr.ObjDeltaTime;
+            if (_recycleTimer <= 0f)
+                Recycle();
+            return;
+        }
+
         if (!_isActive) return;
 
-        transform.position += _direction * _speed * TimeMgr.ObjDeltaTime;
-
+        _elapsed += TimeMgr.ObjDeltaTime;
         _lifeTimer -= TimeMgr.ObjDeltaTime;
-        if (_lifeTimer <= 0f)
+
+        if (_lifeTimer <= 0f || _target == null || _target.IsDead)
         {
-            Recycle();
+            OnArrive();
+            return;
+        }
+
+        float t = Mathf.Clamp01(_elapsed / _duration);
+        Vector3 targetPos = _target.transform.position;
+
+        Vector3 linearPos = Vector3.Lerp(_startPos, targetPos, t);
+        float arc = _resolvedArcHeight * 4f * t * (1f - t);
+        linearPos.y += arc;
+
+        Vector3 dir = linearPos - transform.position;
+        if (dir.sqrMagnitude > 0.001f)
+        {
+            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0, 0, angle);
+        }
+
+        transform.position = linearPos;
+
+        // t가 1 이상이면 도달
+        if (t >= 1f)
+        {
+            OnArrive();
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnArrive()
     {
-        if (!_isActive) return;
+        _isActive = false;
+        _isWaitingRecycle = true;
+        _recycleTimer = _recycleDelay;
 
-        if (other.CompareTag("Enemy"))
+        // 데미지 처리
+        if (_target != null && !_target.IsDead)
         {
-            var enemy = other.GetComponent<Monster>();
-            if (enemy != null && !enemy.IsDead)
+            var monster = _target as Monster;
+            if (monster != null)
             {
-                enemy.TakeDamage(_damage);
-
-                // 히트 이펙트
-                InGameMgr.Inst.SpawnHitEffect(other.ClosestPoint(transform.position));
-
-                if (!_isPiercing)
-                {
-                    Recycle();
-                }
+                monster.OnHit(_damage);
+                //InGameMgr.Inst.SpawnHitEffect(monster.transform.position);
             }
         }
+
+        // 파티클 emit 중지 → 대기 동안 자연 소멸
+        if (_trail != null)
+            _trail.Stop(true, ParticleSystemStopBehavior.StopEmitting);
     }
 
     private void Recycle()
     {
+        _isWaitingRecycle = false;
         _isActive = false;
+        if (_trail != null)
+            _trail.Clear();
         ObjectPoolMgr.Inst.Recycle(gameObject);
     }
 
     public void OnSpawn()
     {
         _isActive = false;
+        _isWaitingRecycle = false;
     }
 
     public void OnRecycle()
     {
         _isActive = false;
+        _isWaitingRecycle = false;
     }
 }

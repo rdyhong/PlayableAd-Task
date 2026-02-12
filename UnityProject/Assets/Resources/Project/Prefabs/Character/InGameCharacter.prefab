@@ -79,8 +79,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41e266dc997c1784c96aa1aea570903b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InGameCharacter
-  _spriteRenderer: {fileID: 0}
-  _animController: {fileID: 0}
+  _bodyRoot: {fileID: 4283227393440342787}
 --- !u!114 &8431808751653664733
 MonoBehaviour:
   m_ObjectHideFlags: 0

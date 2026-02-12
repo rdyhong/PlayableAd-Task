@@ -6,8 +6,8 @@ using UnityEngine;
 public static class GameConfig
 {
     // 스폰
-    public const float SPAWN_RADIUS_MIN = 8f;
-    public const float SPAWN_RADIUS_MAX = 12f;
+    public const float SPAWN_RADIUS_MIN = 0f;
+    public const float SPAWN_RADIUS_MAX = 8f;
     public const float SPAWN_INTERVAL = 0.3f;
 
     // 플레이어
@@ -26,7 +26,7 @@ public static class GameConfig
 
     // 투사체
     public const float PROJECTILE_SPEED = 15f;
-    public const float PROJECTILE_LIFETIME = 3f;
+    public const float PROJECTILE_LIFETIME = 0.5f;
 
     // 이펙트
     public const float DAMAGE_TEXT_DURATION = 0.8f;

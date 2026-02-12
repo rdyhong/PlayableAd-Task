@@ -1,5 +1,6 @@
-using UnityEngine;
 using DG.Tweening;
+using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 
 /// <summary>
 /// 적 — 플레이어 추적, 근접 공격, 사망 시 풀링 회수
@@ -18,9 +19,11 @@ public class Monster : EntityBase, IPoolingObject
         base.Awake();
     }
 
-    public void Init(float statMultiplier = 1f)
+    public override void Initialize()
     {
-        _statMultiplier = statMultiplier;
+        base.Initialize();
+
+        _statMultiplier = InGameMgr.Inst.CurrentWave;
 
         var stat = StatData.EnemyDefault();
         stat.maxHp = Mathf.RoundToInt(stat.maxHp * _statMultiplier);
@@ -46,7 +49,7 @@ public class Monster : EntityBase, IPoolingObject
     #region AI
     private void ChaseTarget()
     {
-        Vector3 dir = (_target.transform.position - transform.position).normalized;
+        Vector3 dir = Vector3.left;
         transform.position += dir * Stat.moveSpeed * TimeMgr.ObjDeltaTime;
     }
 
@@ -67,38 +70,38 @@ public class Monster : EntityBase, IPoolingObject
         if (_target == null) return;
 
         var player = _target.GetComponent<InGameCharacter>();
-        player?.TakeDamage(Stat.atk, this);
+        player.OnHit(Stat.atk, this);
 
     }
     #endregion
 
     #region Damage / Death
-    public override void OnHit(int damage)
+    public override void OnHit(int damage, EntityBase attacker = null)
     {
-        // 피격 플래시 (셰이더 기반 흰색 플래시)
-        if (_hitFlash != null)
-            _hitFlash.Flash();
+        base.OnHit(damage, attacker);
 
-        // 넉백
+        // 넉백 → 복귀
         if (_target != null)
         {
-            Vector3 knockDir = (transform.position - _target.transform.position).normalized;
-            transform.DOMove(transform.position + knockDir * 0.3f, 0.1f);
-        }
+            _bodyRoot.DOKill();
+            _bodyRoot.localPosition = Vector3.zero;
 
-        // 데미지 텍스트
-        InGameMgr.Inst.SpawnDamageText(transform.position, damage);
+            Vector3 knockDir = (transform.position - _target.transform.position).normalized;
+            _bodyRoot.DOLocalMove(knockDir * 0.3f, 0.1f)
+                .SetEase(Ease.OutQuad)
+                .OnComplete(() => _bodyRoot.DOLocalMove(Vector3.zero, 0.15f).SetEase(Ease.InQuad));
+        }
     }
 
-    public override void Dead()
+    public override void OnDead()
     {
         _isDying = true;
-        base.Dead();
+        base.OnDead();
 
         // 경험치 지급
         CharacterMgr.Inst.InGameCharacter.AddExp(GameConfig.EXP_PER_KILL);
 
-        InGameMgr.Inst.OnEnemyKilled(this);
+        MonsterMgr.Inst.OnMonsterDead(this);
 
         ObjectPoolMgr.Inst.Recycle(gameObject);
     }
