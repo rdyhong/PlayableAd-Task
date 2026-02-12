@@ -48,6 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Monster
   _bodyRoot: {fileID: 5097770880199646848}
+  IsDead: 0
 --- !u!114 &6583053608795859076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -120,7 +121,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5681804220818154578, guid: 0d6919e42cc6fb24996726d9a8ed21e8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -2.3
       objectReference: {fileID: 0}
     - target: {fileID: 5681804220818154578, guid: 0d6919e42cc6fb24996726d9a8ed21e8, type: 3}
       propertyPath: m_LocalPosition.z

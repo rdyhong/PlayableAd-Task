@@ -133,12 +133,15 @@ public class Monster : EntityBase, IPoolingObject
 
         MonsterMgr.Inst.OnMonsterDead(this);
 
+        EffectBase eff = ObjectPoolMgr.Inst.Spawn<EffectBase>("Project/Prefabs/Effect/MonsterDeadEffect");
+        eff.Play(transform.position);
+
         StartCoroutine(DeadCo());
     }
 
     private IEnumerator DeadCo()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.3f);
 
         ObjectPoolMgr.Inst.Recycle(gameObject);
     }
