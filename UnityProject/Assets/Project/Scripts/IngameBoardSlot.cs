@@ -20,6 +20,9 @@ public class IngameBoardSlot : MonoBehaviour, IPointerDownHandler, IDragHandler,
     private float _scaleDuration = 0.1f;
     private float _returnDuration = 0.2f;
 
+    private float _lastClickTime;
+    private const float DOUBLE_CLICK_THRESHOLD = 0.3f;
+
     public void Initialize(SlotData slotData)
     {
         Rt = GetComponent<RectTransform>();
@@ -65,10 +68,37 @@ public class IngameBoardSlot : MonoBehaviour, IPointerDownHandler, IDragHandler,
     {
         if (_cachedSlotData?.SlotCell == null) return;
 
+        float now = Time.unscaledTime;
+        if (now - _lastClickTime < DOUBLE_CLICK_THRESHOLD)
+        {
+            _lastClickTime = 0f;
+            TryDoubleClickMerge();
+            return;
+        }
+        _lastClickTime = now;
+
         _txtGrade.text = string.Empty;
         _cachedSlotData.SlotCell.Rt.DOKill();
         _cachedSlotData.SlotCell.Rt.DOScale(_grabScale, _scaleDuration).SetEase(Ease.OutBack);
         _cachedSlotData.SlotCell.Rt.SetAsLastSibling();
+    }
+
+    private void TryDoubleClickMerge()
+    {
+        var boardUI = InGameMain.Inst.MainUI.InGameUI.BoardUI;
+
+        foreach (var pair in boardUI.SlotDict)
+        {
+            SlotData other = pair.Value;
+            if (other == _cachedSlotData) continue;
+            if (other.SlotCell == null) continue;
+            if (other.Grade != _cachedSlotData.Grade) continue;
+
+            // 같은 등급 찾음 → 상대 제거 + 내 슬롯 업그레이드
+            other.ClearSlot();
+            _cachedSlotData.Upgrade();
+            return;
+        }
     }
 
     public void OnDrag(PointerEventData eventData)
