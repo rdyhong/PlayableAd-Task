@@ -198,7 +198,7 @@ public class InGameMgr : Singleton<InGameMgr>
 
     public void SpawnHitEffect(Vector3 position)
     {
-        HitEffect fx = ObjectPoolMgr.Inst.Spawn<HitEffect>("Prefabs/Effect/HitEffect");
+        EffectBase fx = ObjectPoolMgr.Inst.Spawn<EffectBase>("Prefabs/Effect/HitEffect");
         fx.Play(position);
     }
     #endregion

@@ -1,19 +1,39 @@
 using System.Collections;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 /// <summary>
 /// 피격 이펙트 — ParticleSystem 재생 후 duration 대기하고 풀 회수
 /// </summary>
-public class HitEffect : MonoBehaviour, IPoolingObject
+public class EffectBase : MonoBehaviour, IPoolingObject
 {
     [SerializeField] private ParticleSystem _particle;
 
     private Coroutine _recycleCoroutine;
 
-    public void Play(Vector3 position)
-    {
-        transform.position = position;
+    private RectTransform _rt;
 
+    public void Play(Vector3 position, bool isUI = false)
+    {
+        if (isUI)
+        {
+            if (_rt == null) _rt = GetComponent<RectTransform>();
+
+            _rt.anchoredPosition3D = position;
+            _rt.SetParent(InGameMain.Inst.MainUI.InGameUI.BoardUI.RtEffectParent, false);
+        }
+        else
+        {
+            transform.position = position;
+        }
+
+        transform.localScale = Vector3.one;
+
+        Initialize();
+    }
+
+    private void Initialize()
+    {
         if (_particle == null)
             _particle = GetComponent<ParticleSystem>();
 

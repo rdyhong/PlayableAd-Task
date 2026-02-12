@@ -10,6 +10,9 @@ public class InGameBoardUI : MonoBehaviour
     public RectTransform RtCellsParent => _rtCellsParent;
     [SerializeField] private RectTransform _rtCellsParent;
 
+    public RectTransform RtEffectParent => _rtEffectsParent;
+    [SerializeField] private RectTransform _rtEffectsParent;
+
     [SerializeField] private Button _btnSpawn;
 
     private const int ROW_COUNT = 4;
@@ -20,7 +23,7 @@ public class InGameBoardUI : MonoBehaviour
         for(int i = 0; i < _slots.Length; i++)
         {
             Vector2Int coord = new Vector2Int(i % COL_COUNT, i / COL_COUNT);
-            SlotDict.Add(coord, new SlotData(_slots[i], coord, 1));
+            SlotDict.Add(coord, new SlotData(_slots[i], coord));
             SlotDict[coord].SetLock(COL_COUNT <= i);
         }
 
@@ -86,11 +89,10 @@ public class SlotData
     public int Grade { get; private set; } = 0;
     public bool IsLock { get; private set; } = false;
 
-    public SlotData(IngameBoardSlot boardSlot, Vector2Int coord, int grade)
+    public SlotData(IngameBoardSlot boardSlot, Vector2Int coord)
     {
         BoardSlot = boardSlot;
         Coord = coord;
-        Grade = grade;
         BoardSlot.Initialize(this);
     }
 
@@ -120,14 +122,19 @@ public class SlotData
             ObjectPoolMgr.Inst.Recycle(SlotCell.gameObject);
             SlotCell = null;
         }
+
         Grade = 0;
+
         BoardSlot.ClearSlot();
     }
 
     public void CreateSlotCell()
     {
         if (SlotCell != null) ObjectPoolMgr.Inst.Recycle(SlotCell.gameObject);
+        
+        Grade = 1;
         BoardSlot.CreateSlotCell(Grade);
+        
         IngameBoardSlotCell cell = ObjectPoolMgr.Inst.Spawn<IngameBoardSlotCell>("Project/Prefabs/UI/IngameBoardSlotCell");
         cell.Initialize();
         cell.Rt.SetParent(InGameMain.Inst.MainUI.InGameUI.BoardUI.RtCellsParent, false);
@@ -146,6 +153,9 @@ public class SlotData
         SlotCell.Rt.anchoredPosition3D = BoardSlot.Rt.anchoredPosition3D;
         Grade++;
         BoardSlot.UpgradeSlot(Grade);
+
+        EffectBase eff = ObjectPoolMgr.Inst.Spawn<EffectBase>("Project/Prefabs/UI/Effects/MergeEffectUI");
+        eff.Play(SlotCell.Rt.anchoredPosition3D, true);
     }
 }
 
