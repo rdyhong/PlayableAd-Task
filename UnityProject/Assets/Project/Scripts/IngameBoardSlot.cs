@@ -6,86 +6,129 @@ using TMPro;
 
 public class SlotData
 {
+    public IngameBoardSlot BoardSlot { get; private set; } = null;
+    public IngameBoardSlotCell SlotCell { get; private set; }
+
+    public Vector2Int Coord { get; private set; } = Vector2Int.zero;
+
     public int Grade { get; private set; } = 0;
 
+    public SlotData(IngameBoardSlot boardSlot, Vector2Int coord, int grade)
+    {
+        BoardSlot = boardSlot;
+        Coord = coord;
+        Grade = grade;
 
+        BoardSlot.Initialize(this);
+    }
+
+    public void ClearSlot()
+    {
+        if (SlotCell != null)
+        {
+            ObjectPoolMgr.Inst.Recycle(SlotCell.gameObject);
+            SlotCell = null;
+        }
+
+        BoardSlot.ClearSlot();
+    }
+
+    public void CreateSlotCell()
+    {
+        if (SlotCell != null) ObjectPoolMgr.Inst.Recycle(SlotCell.gameObject);
+
+        BoardSlot.CreateSlotCell(Grade);
+
+        IngameBoardSlotCell cell = ObjectPoolMgr.Inst.Spawn<IngameBoardSlotCell>("Project/Prefabs/UI/IngameBoardSlotCell");
+        cell.Initialize();
+        cell.Rt.SetParent(InGameMain.Inst.MainUI.InGameUI.BoardUI.RtCellsParent, false);
+        cell.Rt.localScale = Vector3.one;
+        cell.Rt.anchoredPosition3D = BoardSlot.Rt.anchoredPosition3D;
+
+        SlotCell = cell;
+    }
+
+    public void Upgrade()
+    {
+        if (SlotCell != null) ObjectPoolMgr.Inst.Recycle(SlotCell.gameObject);
+
+        SlotCell = ObjectPoolMgr.Inst.Spawn<IngameBoardSlotCell>("Project/Prefabs/UI/IngameBoardSlotCell");
+        SlotCell.Initialize();
+        SlotCell.Rt.SetParent(InGameMain.Inst.MainUI.InGameUI.BoardUI.RtCellsParent, false);
+        SlotCell.Rt.localScale = Vector3.one;
+        SlotCell.Rt.anchoredPosition3D = BoardSlot.Rt.anchoredPosition3D;
+
+        Grade++;
+    }
 }
 
 public class IngameBoardSlot : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
 {
     [SerializeField] private TextMeshProUGUI _txtGrade;
 
-    public SlotData SlotData { get; private set; } = null;
+    private SlotData _cachedSlotData;
 
-
-    public IngameBoardSlotCell SlotCell { get; private set; }
     public RectTransform Rt { get; private set; }
-
-    public Vector2Int Coord { get; private set; }
-
-    //private Canvas _canvas;
 
     private float _grabScale = 1.2f;
     private float _scaleDuration = 0.1f;
     private float _returnDuration = 0.2f;
 
-    public void Initialize(Vector2Int coord)
+    public void Initialize(SlotData slotData)
     {
         Rt = GetComponent<RectTransform>();
-        Coord = coord;
-        SlotData = new SlotData();
+        
+        _cachedSlotData = slotData;
         _txtGrade.text = string.Empty;
-
-        CreateSlotCell(new SlotData());
     }
 
-    public void CreateSlotCell(SlotData data)
+    public void CreateSlotCell(int grade)
     {
-        SlotData = data;
+        _txtGrade.text = grade.ToString();
+    }
 
-        IngameBoardSlotCell cell = ObjectPoolMgr.Inst.Spawn<IngameBoardSlotCell>("Project/Prefabs/UI/IngameBoardSlotCell");
-        cell.Initialize();
-        cell.Rt.SetParent(InGameMain.Inst.MainUI.InGameUI.BoardUI.RtCellsParent, false);
-        cell.Rt.localScale = Vector3.one;
-        cell.Rt.anchoredPosition3D = Rt.anchoredPosition3D;
+    public void ClearSlot()
+    {
+        _txtGrade.text = string.Empty;
+    }
 
-        SlotCell = cell;
-
-        _txtGrade.text = SlotData.Grade.ToString();
+    public void UpgradeSlot(int grade)
+    {        
+        _txtGrade.text = grade.ToString();
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (SlotCell.Rt == null) return;
+        if (_cachedSlotData.SlotCell.Rt == null) return;
 
         _txtGrade.text = string.Empty;
 
-        SlotCell.Rt.DOKill();
-        SlotCell.Rt.DOScale(_grabScale, _scaleDuration).SetEase(Ease.OutBack);
-        SlotCell.Rt.SetAsLastSibling();
+        _cachedSlotData.SlotCell.Rt.DOKill();
+        _cachedSlotData.SlotCell.Rt.DOScale(_grabScale, _scaleDuration).SetEase(Ease.OutBack);
+        _cachedSlotData.SlotCell.Rt.SetAsLastSibling();
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (SlotData == null) return;
+        if (_cachedSlotData == null) return;
 
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            SlotCell.Rt.parent as RectTransform,
+            _cachedSlotData.SlotCell.Rt.parent as RectTransform,
             eventData.position,
             InGameMain.Inst.MainUI.Canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : InGameMain.Inst.MainUI.Canvas.worldCamera,
             out Vector2 localPoint);
 
-        SlotCell.Rt.localPosition = localPoint;
+        _cachedSlotData.SlotCell.Rt.localPosition = localPoint;
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        if (SlotCell.Rt == null) return;
+        if (_cachedSlotData.SlotCell.Rt == null) return;
 
-        _txtGrade.text = SlotData.Grade.ToString();
+        _txtGrade.text = _cachedSlotData.Grade.ToString();
 
-        SlotCell.Rt.DOKill();
-        SlotCell.Rt.DOLocalMove(Rt.anchoredPosition3D, _returnDuration).SetEase(Ease.OutBack);
-        SlotCell.Rt.DOScale(1f, _returnDuration).SetEase(Ease.OutBack);
+        _cachedSlotData.SlotCell.Rt.DOKill();
+        _cachedSlotData.SlotCell.Rt.DOLocalMove(Rt.anchoredPosition3D, _returnDuration).SetEase(Ease.OutBack);
+        _cachedSlotData.SlotCell.Rt.DOScale(1f, _returnDuration).SetEase(Ease.OutBack);
     }
 }
