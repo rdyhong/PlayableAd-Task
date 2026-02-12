@@ -8,7 +8,6 @@ using UnityEngine;
 public class Monster : EntityBase, IPoolingObject
 {
     private EntityBase _target;
-    private bool _isDying;
 
     // 스탯 배율 (웨이브에 따라 강화)
     private float _statMultiplier = 1f;
@@ -33,7 +32,6 @@ public class Monster : EntityBase, IPoolingObject
 
         InitStat(stat);
 
-        _isDying = false;
         _target = CharacterMgr.Inst.InGameCharacter;
 
         if (_lifeCycleCo != null)
@@ -43,7 +41,7 @@ public class Monster : EntityBase, IPoolingObject
 
     private IEnumerator LifeCycleCo()
     {
-        while (!IsDead && !_isDying)
+        while (!IsDead)
         {
             if (_target == null || _target.IsDead)
             {
@@ -120,7 +118,6 @@ public class Monster : EntityBase, IPoolingObject
 
     public override void OnDead()
     {
-        _isDying = true;
         base.OnDead();
 
         if (_lifeCycleCo != null)
@@ -136,6 +133,13 @@ public class Monster : EntityBase, IPoolingObject
 
         MonsterMgr.Inst.OnMonsterDead(this);
 
+        StartCoroutine(DeadCo());
+    }
+
+    private IEnumerator DeadCo()
+    {
+        yield return new WaitForSeconds(1f);
+
         ObjectPoolMgr.Inst.Recycle(gameObject);
     }
     #endregion
@@ -148,7 +152,6 @@ public class Monster : EntityBase, IPoolingObject
 
     public override void OnRecycle()
     {
-        _isDying = false;
         _target = null;
 
         if (_lifeCycleCo != null)

@@ -12,8 +12,8 @@ public abstract class EntityBase : MonoBehaviour, IPoolingObject
     public StatData Stat { get; protected set; }
 
     protected HitFlash _hitFlash;
-    
-    public bool IsDead => Stat != null && Stat.IsDead;
+
+    public bool IsDead = false;
 
     protected AnimController _animController;
 
@@ -29,31 +29,13 @@ public abstract class EntityBase : MonoBehaviour, IPoolingObject
         _hitFlash = GetComponent<HitFlash>();
         if (_hitFlash != null)
             _hitFlash.ResetFlash();
+
+        IsDead = false;
     }
 
     public virtual void InitStat(StatData stat)
     {
         Stat = stat;
-    }
-
-    /// <summary>
-    /// 데미지 처리. 반환값: 실제 적용된 데미지
-    /// </summary>
-    public virtual int TakeDamage(int damage, EntityBase attacker = null)
-    {
-        if (IsDead) return 0;
-
-        int actualDamage = Mathf.Max(1, damage);
-        Stat.TakeDamage(actualDamage);
-
-        OnHit(actualDamage);
-
-        if (IsDead)
-        {
-            OnDead();
-        }
-
-        return actualDamage;
     }
 
     public virtual void OnHit(int damage, EntityBase attacker = null)
@@ -65,7 +47,7 @@ public abstract class EntityBase : MonoBehaviour, IPoolingObject
 
         Stat.TakeDamage(damage);
 
-        if (IsDead)
+        if (Stat.IsDead)
         {
             OnDead();
         }
@@ -73,7 +55,8 @@ public abstract class EntityBase : MonoBehaviour, IPoolingObject
 
     public virtual void OnDead()
     {
-
+        if (IsDead) return;
+        IsDead = true;
     }
 
     public virtual void OnSpawn()
