@@ -42,26 +42,20 @@ public abstract class EntityBase : MonoBehaviour, IPoolingObject
 
         if (IsDead)
         {
-            Die();
+            Dead();
         }
 
         return actualDamage;
     }
 
-    protected virtual void OnHit(int damage)
+    public virtual void OnHit(int damage)
     {
         // 피격 연출 (자식에서 override)
     }
 
-    protected virtual void Die()
+    public virtual void Dead()
     {
         OnDeath?.Invoke(this);
-        OnDeathEffect();
-    }
-
-    protected virtual void OnDeathEffect()
-    {
-        // 사망 연출 (자식에서 override)
     }
 
     /// <summary>

@@ -83,7 +83,7 @@ public class Enemy : EntityBase, IPoolingObject
     #endregion
 
     #region Damage / Death
-    protected override void OnHit(int damage)
+    public override void OnHit(int damage)
     {
         // 피격 플래시
         if (_spriteRenderer != null)
@@ -105,10 +105,10 @@ public class Enemy : EntityBase, IPoolingObject
         InGameMgr.Inst.SpawnDamageText(transform.position, damage);
     }
 
-    protected override void Die()
+    public override void Dead()
     {
         _isDying = true;
-        base.Die();
+        base.Dead();
 
         // 경험치 지급
         InGameMgr.Inst.InGameCharacter.AddExp(GameConfig.EXP_PER_KILL);

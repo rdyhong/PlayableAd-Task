@@ -88,7 +88,7 @@ public class InGameCharacter : EntityBase
     #endregion
 
     #region Damage / Death
-    protected override void OnHit(int damage)
+    public override void OnHit(int damage)
     {
         if (_isInvincible) return;
 
@@ -100,9 +100,9 @@ public class InGameCharacter : EntityBase
         }
     }
 
-    protected override void Die()
+    public override void Dead()
     {
-        base.Die();
+        base.Dead();
         if (_animator != null)
             _animator.SetTrigger("Die");
 
