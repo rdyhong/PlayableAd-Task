@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,6 +19,8 @@ public class InGameBoardUI : MonoBehaviour
 
     private const int ROW_COUNT = 4;
     private const int COL_COUNT = 10;
+
+    private const string SPAWN_EFFECT_TRAIL_PATH = "Project/Prefabs/UI/Effects/SpawnCellEffectUI";
 
     public void Initialize()
     {
@@ -63,6 +67,9 @@ public class InGameBoardUI : MonoBehaviour
         if(emptySlot != null)
         {
             emptySlot.CreateSlotCell();
+
+            EffectBase eff = ObjectPoolMgr.Inst.Spawn<EffectBase>(SPAWN_EFFECT_TRAIL_PATH);
+            eff.Play(emptySlot.BoardSlot.Rt.anchoredPosition3D, true);
         }
     }
 

@@ -125,7 +125,7 @@ public class InGameCharacter : EntityBase
         Vector3 dir = (target.transform.position - _cachedTransform.position).normalized;
 
         Projectile proj = ObjectPoolMgr.Inst.Spawn<Projectile>("Project/Prefabs/Effect/Projectile_0");
-        proj.Init(this, target, Stat.atk, ArcType.Down);
+        proj.Init(this, target, GameConfig.PLAYER_ATK, ArcType.Down);
     }
     #endregion
 

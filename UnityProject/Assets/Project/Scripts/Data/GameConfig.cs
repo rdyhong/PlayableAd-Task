@@ -14,15 +14,15 @@ public static class GameConfig
     public const float PLAYER_MOVE_SPEED = 5f;
     public const float PLAYER_ATTACK_COOLDOWN = 0.15f;
     public const float PLAYER_ATTACK_RANGE = 10f;
-    public const int PLAYER_MAX_HP = 100;
+    public const int PLAYER_MAX_HP = 500;
     public const int PLAYER_ATK = 1;
 
     // 적
     public const float ENEMY_MOVE_SPEED = 2f;
-    public const int ENEMY_HP = 30;
+    public const int ENEMY_HP = 20;
     public const int ENEMY_ATK = 5;
     public const float ENEMY_ATTACK_RANGE = 10f;
-    public const float ENEMY_ATTACK_COOLDOWN = 1f;
+    public const float ENEMY_ATTACK_COOLDOWN = 1.5f;
 
     // 투사체
     public const float PROJECTILE_SPEED = 15f;

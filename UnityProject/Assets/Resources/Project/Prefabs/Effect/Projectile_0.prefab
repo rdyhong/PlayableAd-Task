@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3610406201301827984}
   - component: {fileID: 578809468327236865}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Square
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,7 +101,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4998677582357441499}
   - component: {fileID: 6604112395929136329}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Projectile_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -150,9 +150,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4998677582357441499}
     m_Modifications:
+    - target: {fileID: 113104, guid: 23818e20c9fcaa74eae69d5f3348c74d, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 130200, guid: 23818e20c9fcaa74eae69d5f3348c74d, type: 3}
       propertyPath: m_Name
       value: StarTrail
+      objectReference: {fileID: 0}
+    - target: {fileID: 130200, guid: 23818e20c9fcaa74eae69d5f3348c74d, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 145100, guid: 23818e20c9fcaa74eae69d5f3348c74d, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 466980, guid: 23818e20c9fcaa74eae69d5f3348c74d, type: 3}
       propertyPath: m_LocalScale.x
