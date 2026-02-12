@@ -60,6 +60,19 @@ public class HitFlash : MonoBehaviour
     }
 
     /// <summary>
+    /// 플래시 즉시 초기화. 풀 재사용 시 호출.
+    /// </summary>
+    public void ResetFlash()
+    {
+        if (_flashCoroutine != null)
+        {
+            StopCoroutine(_flashCoroutine);
+            _flashCoroutine = null;
+        }
+        SetFlash(0f);
+    }
+
+    /// <summary>
     /// 런타임 중 자식이 변경되었을 때 렌더러 배열 갱신용
     /// </summary>
     public void RefreshRenderers()

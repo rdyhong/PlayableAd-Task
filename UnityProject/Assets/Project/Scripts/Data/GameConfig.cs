@@ -13,15 +13,15 @@ public static class GameConfig
     // 플레이어
     public const float PLAYER_MOVE_SPEED = 5f;
     public const float PLAYER_ATTACK_COOLDOWN = 0.15f;
-    public const float PLAYER_ATTACK_RANGE = 6f;
+    public const float PLAYER_ATTACK_RANGE = 10f;
     public const int PLAYER_MAX_HP = 100;
-    public const int PLAYER_ATK = 10;
+    public const int PLAYER_ATK = 1;
 
     // 적
     public const float ENEMY_MOVE_SPEED = 2f;
     public const int ENEMY_HP = 30;
     public const int ENEMY_ATK = 5;
-    public const float ENEMY_ATTACK_RANGE = 0.8f;
+    public const float ENEMY_ATTACK_RANGE = 10f;
     public const float ENEMY_ATTACK_COOLDOWN = 1f;
 
     // 투사체
@@ -39,8 +39,8 @@ public static class GameConfig
 
     // 웨이브
     public const float WAVE_INTERVAL = 3f;
-    public const int WAVE_BASE_ENEMY_COUNT = 5;
-    public const int WAVE_ENEMY_INCREMENT = 3;
+    public const int WAVE_BASE_ENEMY_COUNT = 3;
+    public const int WAVE_ENEMY_INCREMENT = 1;
 
     // 경험치 / 레벨업
     public const int EXP_PER_KILL = 10;

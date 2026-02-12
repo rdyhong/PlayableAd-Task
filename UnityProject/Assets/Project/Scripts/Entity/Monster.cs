@@ -1,5 +1,5 @@
+using System.Collections;
 using DG.Tweening;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 /// <summary>
@@ -8,11 +8,12 @@ using UnityEngine;
 public class Monster : EntityBase, IPoolingObject
 {
     private EntityBase _target;
-    private float _attackTimer;
     private bool _isDying;
 
     // 스탯 배율 (웨이브에 따라 강화)
     private float _statMultiplier = 1f;
+
+    private Coroutine _lifeCycleCo;
 
     protected override void Awake()
     {
@@ -32,48 +33,63 @@ public class Monster : EntityBase, IPoolingObject
 
         InitStat(stat);
 
-        _attackTimer = 0f;
         _isDying = false;
         _target = CharacterMgr.Inst.InGameCharacter;
+
+        if (_lifeCycleCo != null)
+            StopCoroutine(_lifeCycleCo);
+        _lifeCycleCo = StartCoroutine(LifeCycleCo());
     }
 
-    private void Update()
+    private IEnumerator LifeCycleCo()
     {
-        if (IsDead || _isDying) return;
-        if (_target == null) return;
+        while (!IsDead && !_isDying)
+        {
+            if (_target == null || _target.IsDead)
+            {
+                _animController.PlayAnim(EAnimType.Idle);
+                yield return null;
+                continue;
+            }
 
-        ChaseTarget();
-        TryAttack();
+            float dist = Mathf.Abs(_target.transform.position.x - transform.position.x);
+
+            if (dist <= Stat.attackRange)
+            {
+                yield return AttackCo();
+            }
+            else
+            {
+                MoveUpdate();
+            }
+
+            yield return null;
+        }
     }
 
-    #region AI
-    private void ChaseTarget()
+    private void MoveUpdate()
     {
-        Vector3 dir = Vector3.left;
-        transform.position += dir * Stat.moveSpeed * TimeMgr.ObjDeltaTime;
+        Vector3 dir = (_target.transform.position - transform.position).normalized;
+        dir.y = 0f;
+        dir.z = 0f;
+        transform.position += Vector3.left * Stat.moveSpeed * TimeMgr.ObjDeltaTime;
+
+        _animController.PlayAnim(EAnimType.Walk);
     }
 
-    private void TryAttack()
+    private IEnumerator AttackCo()
     {
-        _attackTimer += TimeMgr.ObjDeltaTime;
+        _animController.PlayAnim(EAnimType.Attack);
 
-        float dist = Vector3.Distance(transform.position, _target.transform.position);
-        if (dist > Stat.attackRange) return;
-        if (_attackTimer < Stat.attackCooldown) return;
+        // 공격 판정
+        if (_target != null && !_target.IsDead)
+        {
+            _target.OnHit(Stat.atk, this);
+        }
 
-        _attackTimer = 0f;
-        Attack();
+        // 공격 쿨다운 대기
+        yield return new WaitForSeconds(Stat.attackCooldown);
     }
-
-    private void Attack()
-    {
-        if (_target == null) return;
-
-        var player = _target.GetComponent<InGameCharacter>();
-        player.OnHit(Stat.atk, this);
-
-    }
-    #endregion
 
     #region Damage / Death
     public override void OnHit(int damage, EntityBase attacker = null)
@@ -98,6 +114,14 @@ public class Monster : EntityBase, IPoolingObject
         _isDying = true;
         base.OnDead();
 
+        if (_lifeCycleCo != null)
+        {
+            StopCoroutine(_lifeCycleCo);
+            _lifeCycleCo = null;
+        }
+
+        _animController.PlayAnim(EAnimType.Death);
+
         // 경험치 지급
         CharacterMgr.Inst.InGameCharacter.AddExp(GameConfig.EXP_PER_KILL);
 
@@ -110,7 +134,7 @@ public class Monster : EntityBase, IPoolingObject
     #region Pooling
     public override void OnSpawn()
     {
-        // Init()에서 처리
+        // Initialize()에서 처리
     }
 
     public override void OnRecycle()
@@ -118,7 +142,14 @@ public class Monster : EntityBase, IPoolingObject
         _isDying = false;
         _target = null;
 
-        transform.DOKill();
+        if (_lifeCycleCo != null)
+        {
+            StopCoroutine(_lifeCycleCo);
+            _lifeCycleCo = null;
+        }
+
+        _bodyRoot.DOKill();
+        _bodyRoot.localPosition = Vector3.zero;
     }
     #endregion
 }

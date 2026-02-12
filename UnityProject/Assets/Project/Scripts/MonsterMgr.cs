@@ -17,11 +17,10 @@ public class MonsterMgr : Singleton<MonsterMgr>
     public void SpawnMonster()
     {
         Monster monster = ObjectPoolMgr.Inst.Spawn<Monster>($"{MonsterPath}Monster_{Random.Range(0, 5).ToString()}");
-        monster.Initialize();
-
         Vector3 spawnPos = CharacterMgr.Inst.InGameCharacter.transform.position + new Vector3(5f, 5f, 0f);
         monster.transform.position = GetRandomSpawnPosition();
 
+        monster.Initialize();
         SpawnedMonsterList.Add(monster);
     }
 

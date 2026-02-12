@@ -23,6 +23,7 @@ public class Projectile : MonoBehaviour, IPoolingObject
     [SerializeField] private float _arcRandomRange = 0.5f;
     [SerializeField] private float _recycleDelay = 1f;
     [SerializeField] private ParticleSystem _trail;
+    [SerializeField] private GameObject _go;
 
     public void Init(EntityBase startEntity, EntityBase targetEntity, int damage, ArcType arcType = ArcType.Up)
     {
@@ -46,6 +47,8 @@ public class Projectile : MonoBehaviour, IPoolingObject
             _trail.Clear();
             _trail.Play();
         }
+
+        _go.SetActive(true);
     }
 
     private void Update()
@@ -79,8 +82,8 @@ public class Projectile : MonoBehaviour, IPoolingObject
         Vector3 dir = linearPos - transform.position;
         if (dir.sqrMagnitude > 0.001f)
         {
-            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0, 0, angle);
+            float angle = Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0, 0, -angle);
         }
 
         transform.position = linearPos;
@@ -94,6 +97,7 @@ public class Projectile : MonoBehaviour, IPoolingObject
 
     private void OnArrive()
     {
+        _go.SetActive(false);
         _isActive = false;
         _isWaitingRecycle = true;
         _recycleTimer = _recycleDelay;

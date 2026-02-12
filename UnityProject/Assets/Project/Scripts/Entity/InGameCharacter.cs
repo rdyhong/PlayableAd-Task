@@ -55,7 +55,8 @@ public class InGameCharacter : EntityBase
     {
         while(true)
         {
-            Monster nearestMonster = MonsterMgr.Inst.GetNearestMonster(transform.position, 10);
+            Monster nearestMonster = MonsterMgr.Inst.GetNearestMonster(transform.position, GameConfig.PLAYER_ATTACK_RANGE);
+
             if (nearestMonster != null)
             {
                 yield return AttackCo();
@@ -124,7 +125,7 @@ public class InGameCharacter : EntityBase
         Vector3 dir = (target.transform.position - _cachedTransform.position).normalized;
 
         Projectile proj = ObjectPoolMgr.Inst.Spawn<Projectile>("Project/Prefabs/Effect/Projectile_0");
-        proj.Init(this, target, Stat.atk);
+        proj.Init(this, target, Stat.atk, ArcType.Down);
     }
     #endregion
 

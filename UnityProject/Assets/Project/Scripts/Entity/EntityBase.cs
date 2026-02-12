@@ -27,6 +27,8 @@ public abstract class EntityBase : MonoBehaviour, IPoolingObject
         _animController = GetComponent<AnimController>();
 
         _hitFlash = GetComponent<HitFlash>();
+        if (_hitFlash != null)
+            _hitFlash.ResetFlash();
     }
 
     public virtual void InitStat(StatData stat)
