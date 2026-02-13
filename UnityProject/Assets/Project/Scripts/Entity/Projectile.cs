@@ -25,14 +25,14 @@ public class Projectile : MonoBehaviour, IPoolingObject
     [SerializeField] private ParticleSystem _trail;
     [SerializeField] private GameObject _go;
 
-    public void Init(EntityBase startEntity, EntityBase targetEntity, int damage, ArcType arcType = ArcType.Up)
+    public void Init(EntityBase startEntity, EntityBase targetEntity, int damage, ArcType arcType = ArcType.Up, float duration = GameConfig.PROJECTILE_LIFETIME)
     {
         _startPos = startEntity.transform.position;
         transform.position = _startPos;
         _target = targetEntity;
         _damage = damage;
         _elapsed = 0f;
-        _duration = GameConfig.PROJECTILE_LIFETIME;
+        _duration = duration;
         _lifeTimer = _duration;
         _isActive = true;
         _isWaitingRecycle = false;

@@ -88,6 +88,7 @@ public class InGameCharacter : EntityBase
         {
             if (TimeMgr.GetUtcTimeSeconds() - _lastAttackTime >= Stat.attackCooldown)
             {
+                float atkCuration = 1 - (SlotData.HighstGrade - 1) * 0.15f;
                 // 가장 가까운 적 탐색
                 EntityBase target = MonsterMgr.Inst.GetNearestMonster(_cachedTransform.position, 10);
                 if (target != null)
@@ -95,38 +96,27 @@ public class InGameCharacter : EntityBase
                     _animController.PlayAnim(EAnimType.Attack);
 
                     _lastAttackTime = 0f;
-                    FireProjectile(target);
+                    FireProjectile(target, atkCuration);
                 }
                 else
                 {
                     break;
                 }
 
-                yield return new WaitForSeconds(attackAnimDelay);
+                yield return new WaitForSeconds(atkCuration);
             }
             yield return null;
         }
     }
 
     #region Auto Attack
-    private void HandleAutoAttack()
-    {
-        if (_lastAttackTime < Stat.attackCooldown) return;
 
-        // 가장 가까운 적 탐색
-        EntityBase target = MonsterMgr.Inst.GetNearestMonster(_cachedTransform.position, Stat.attackRange);
-        if (target == null) return;
-
-        _lastAttackTime = 0f;
-        FireProjectile(target);
-    }
-
-    private void FireProjectile(EntityBase target)
+    private void FireProjectile(EntityBase target, float atkCuration)
     {
         Vector3 dir = (target.transform.position - _cachedTransform.position).normalized;
 
         Projectile proj = ObjectPoolMgr.Inst.Spawn<Projectile>("Project/Prefabs/Effect/Projectile_0");
-        proj.Init(this, target, GameConfig.PLAYER_ATK + GameConfig.PLAYER_ATK_PER_FISH_GRADE * SlotData.HighstGrade, ArcType.Down);
+        proj.Init(this, target, GameConfig.PLAYER_ATK + GameConfig.PLAYER_ATK_PER_FISH_GRADE * SlotData.HighstGrade, ArcType.Down, atkCuration);
     }
     #endregion
 

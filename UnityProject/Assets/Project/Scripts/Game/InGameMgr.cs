@@ -70,6 +70,8 @@ public class InGameMgr : Singleton<InGameMgr>
         // 시작 대기
         yield return new WaitForSeconds(1f);
 
+        int spawnMonsterCount = GameConfig.WAVE_BASE_ENEMY_COUNT;
+
         while (GameState == EGameState.Playing)
         {
             CurrentWave++;
@@ -79,7 +81,7 @@ public class InGameMgr : Singleton<InGameMgr>
             {
                 CurrentMiniWave++;
 
-                int enemyCount = GameConfig.WAVE_BASE_ENEMY_COUNT + (CurrentWave - 1) * GameConfig.WAVE_ENEMY_INCREMENT + CurrentMiniWave;
+                int enemyCount = spawnMonsterCount * 2; //GameConfig.WAVE_BASE_ENEMY_COUNT + (CurrentWave - 1) * GameConfig.WAVE_ENEMY_INCREMENT + CurrentMiniWave;
                 float statMul = 1f + (CurrentWave - 1) * 0.15f;
 
                 yield return SpawnWave(enemyCount, statMul);
