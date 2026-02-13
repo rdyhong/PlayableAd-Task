@@ -106,6 +106,9 @@ public class Projectile : MonoBehaviour, IPoolingObject
         if (_target != null && !_target.IsDead)
         {
             _target.OnHit(_damage);
+
+            EffectBase eff = ObjectPoolMgr.Inst.Spawn<EffectBase>("Project/Prefabs/Effect/InGameOnHitEffect");
+            eff.Play(transform.position);
             //var monster = _target as Monster;
             //if (monster != null)
             //{
@@ -126,7 +129,7 @@ public class Projectile : MonoBehaviour, IPoolingObject
         if (_trail != null)
             _trail.Clear();
         ObjectPoolMgr.Inst.Recycle(gameObject);
-    }
+    }   
 
     public void OnSpawn()
     {

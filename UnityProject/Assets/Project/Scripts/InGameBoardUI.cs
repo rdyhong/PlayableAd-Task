@@ -16,6 +16,7 @@ public class InGameBoardUI : MonoBehaviour
     [SerializeField] private RectTransform _rtEffectsParent;
 
     [SerializeField] private Button _btnSpawn;
+    [SerializeField] private Button _btnSort;
 
     private const int ROW_COUNT = 4;
     private const int COL_COUNT = 10;
@@ -34,6 +35,7 @@ public class InGameBoardUI : MonoBehaviour
         SetUnlockableSlot();
 
         _btnSpawn.onClick.AddListener(OnClickSpawn);
+        _btnSort.onClick.AddListener(OnClickSort);
     }
 
     private void OnClickSpawn()
@@ -70,6 +72,42 @@ public class InGameBoardUI : MonoBehaviour
 
             EffectBase eff = ObjectPoolMgr.Inst.Spawn<EffectBase>(SPAWN_EFFECT_TRAIL_PATH);
             eff.Play(emptySlot.BoardSlot.Rt.anchoredPosition3D, true);
+        }
+    }
+
+    public void OnClickSort()
+    {
+        // 1. 셀이 있는 슬롯의 grade 수집
+        List<int> grades = new List<int>();
+
+        for (int y = 0; y < ROW_COUNT; y++)
+        {
+            for (int x = 0; x < COL_COUNT; x++)
+            {
+                var slot = SlotDict[new Vector2Int(x, y)];
+                if (!slot.IsLock && slot.SlotCell != null)
+                {
+                    grades.Add(slot.Grade);
+                    slot.ClearSlot();
+                }
+            }
+        }
+
+        // 2. grade 내림차순 정렬
+        grades.Sort((a, b) => b.CompareTo(a));
+
+        // 3. 왼쪽 위부터 순서대로 재배치
+        int idx = 0;
+        for (int y = 0; y < ROW_COUNT && idx < grades.Count; y++)
+        {
+            for (int x = 0; x < COL_COUNT && idx < grades.Count; x++)
+            {
+                var slot = SlotDict[new Vector2Int(x, y)];
+                if (slot.IsLock) continue;
+
+                slot.SetSlotCell(grades[idx]);
+                idx++;
+            }
         }
     }
 
@@ -144,6 +182,21 @@ public class SlotData
         Grade = 1;
         BoardSlot.CreateSlotCell(Grade);
         
+        IngameBoardSlotCell cell = ObjectPoolMgr.Inst.Spawn<IngameBoardSlotCell>("Project/Prefabs/UI/IngameBoardSlotCell");
+        cell.Initialize();
+        cell.Rt.SetParent(InGameMain.Inst.MainUI.InGameUI.BoardUI.RtCellsParent, false);
+        cell.Rt.localScale = Vector3.one;
+        cell.Rt.anchoredPosition3D = BoardSlot.Rt.anchoredPosition3D;
+        SlotCell = cell;
+    }
+
+    public void SetSlotCell(int grade)
+    {
+        if (SlotCell != null) ObjectPoolMgr.Inst.Recycle(SlotCell.gameObject);
+
+        Grade = grade;
+        BoardSlot.CreateSlotCell(Grade);
+
         IngameBoardSlotCell cell = ObjectPoolMgr.Inst.Spawn<IngameBoardSlotCell>("Project/Prefabs/UI/IngameBoardSlotCell");
         cell.Initialize();
         cell.Rt.SetParent(InGameMain.Inst.MainUI.InGameUI.BoardUI.RtCellsParent, false);

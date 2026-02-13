@@ -47,6 +47,9 @@ public abstract class EntityBase : MonoBehaviour, IPoolingObject
 
         Stat.TakeDamage(damage);
 
+        InGameDamageEffect eff = ObjectPoolMgr.Inst.Spawn<InGameDamageEffect>("Project/Prefabs/Effect/InGameDamageEffect");
+        eff.PlayEffect(_bodyRoot.position + Vector3.up * 1.5f, damage);
+
         if (Stat.IsDead)
         {
             OnDead();
